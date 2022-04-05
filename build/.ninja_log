@@ -1,0 +1,5 @@
+# ninja log v5
+0	78	1649141606203032737	CMakeFiles/cpu_usage_tracker.dir/main.c.o	d01f80d3fed6c6fa
+79	153	1649141606275032373	cpu_usage_tracker	ee0de52c59d9b689
+0	54	1649141723550395784	CMakeFiles/cpu_usage_tracker.dir/main.c.o	d01f80d3fed6c6fa
+54	114	1649141723606395465	cpu_usage_tracker	ee0de52c59d9b689

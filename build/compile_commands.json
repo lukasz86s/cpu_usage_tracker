@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/fet/workspace_/cpu_usage_tracker/build",
+  "command": "/usr/bin/gcc   -g   -o CMakeFiles/cpu_usage_tracker.dir/main.c.o   -c /home/fet/workspace_/cpu_usage_tracker/main.c",
+  "file": "/home/fet/workspace_/cpu_usage_tracker/main.c"
+}
+]
