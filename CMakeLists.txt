@@ -12,6 +12,8 @@ set(TRACKER_DIRS
     usage_tracker/tracker.c
     usage_tracker/inc/tracker.h)
 
+set(CMAKE_C_FLAGS_DEBUG "-pthread")
+
 add_executable(cpu_usage_tracker 
     main.c
     ${QUEUE_DIRS}

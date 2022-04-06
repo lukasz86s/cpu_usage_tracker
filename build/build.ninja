@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: cpu_usage_tracker
-# Configuration: Release
+# Configuration: Debug
 # =============================================================================
 
 #############################################
@@ -237,19 +237,19 @@ build cmake_object_order_depends_target_cpu_usage_tracker: phony || CMakeFiles/c
 
 build CMakeFiles/cpu_usage_tracker.dir/main.c.o: C_COMPILER__cpu_usage_tracker ../main.c || cmake_object_order_depends_target_cpu_usage_tracker
   DEP_FILE = CMakeFiles/cpu_usage_tracker.dir/main.c.o.d
-  FLAGS = -O3 -DNDEBUG
+  FLAGS = -pthread
   OBJECT_DIR = CMakeFiles/cpu_usage_tracker.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu_usage_tracker.dir
 
 build CMakeFiles/cpu_usage_tracker.dir/usage_tracker/queue.c.o: C_COMPILER__cpu_usage_tracker ../usage_tracker/queue.c || cmake_object_order_depends_target_cpu_usage_tracker
   DEP_FILE = CMakeFiles/cpu_usage_tracker.dir/usage_tracker/queue.c.o.d
-  FLAGS = -O3 -DNDEBUG
+  FLAGS = -pthread
   OBJECT_DIR = CMakeFiles/cpu_usage_tracker.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu_usage_tracker.dir/usage_tracker
 
 build CMakeFiles/cpu_usage_tracker.dir/usage_tracker/tracker.c.o: C_COMPILER__cpu_usage_tracker ../usage_tracker/tracker.c || cmake_object_order_depends_target_cpu_usage_tracker
   DEP_FILE = CMakeFiles/cpu_usage_tracker.dir/usage_tracker/tracker.c.o.d
-  FLAGS = -O3 -DNDEBUG
+  FLAGS = -pthread
   OBJECT_DIR = CMakeFiles/cpu_usage_tracker.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu_usage_tracker.dir/usage_tracker
 
@@ -262,7 +262,7 @@ build CMakeFiles/cpu_usage_tracker.dir/usage_tracker/tracker.c.o: C_COMPILER__cp
 # Link the executable cpu_usage_tracker
 
 build cpu_usage_tracker: C_EXECUTABLE_LINKER__cpu_usage_tracker CMakeFiles/cpu_usage_tracker.dir/main.c.o CMakeFiles/cpu_usage_tracker.dir/usage_tracker/queue.c.o CMakeFiles/cpu_usage_tracker.dir/usage_tracker/tracker.c.o
-  FLAGS = -O3 -DNDEBUG
+  FLAGS = -pthread
   LINK_FLAGS = -rdynamic
   OBJECT_DIR = CMakeFiles/cpu_usage_tracker.dir
   POST_BUILD = :

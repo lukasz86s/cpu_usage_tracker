@@ -16,10 +16,10 @@ Queue* create_queue(void);
 void destroy_queue(Queue* queue);
 
 /*functio add item to queue*/
-void append_queu(Queue* queue, char* item);
+void append_queu(Queue* queue, char* item, int len);
 
 /*function remove an item from queue*/
-char* decrease_queue(Queue* queue);
+int decrease_queue(Queue* queue, char* buff, int len);
 
 
 #endif
