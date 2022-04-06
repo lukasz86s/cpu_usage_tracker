@@ -14,6 +14,4 @@ void* thread_watchdog_func(void *arg);
 void* thread_logger_func(void *arg);
 
 
-char cpu_info_buffer[FILE_BUFFER_SIZE];
-
 #endif
