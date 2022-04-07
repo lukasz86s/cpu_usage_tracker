@@ -193,7 +193,7 @@ void* thread_analyzer_func(void *arg){
         
         //decrease_queue(queue1, cpu_raw_data, FILE_BUFFER_SIZE) ;
         if(decrease_queue(cpu_info1->queue, cpu_raw_data, FILE_BUFFER_SIZE) != 0){
-            fprintf(stdout, "nothing to read\n");
+            perror( "nothing to read\n");
            continue;
         }
         //reset cpu_index;
@@ -205,7 +205,6 @@ void* thread_analyzer_func(void *arg){
             //searching for the beginning of each core data
             if(strcmp(cpu_info1->labels[cpu_index], token) == 0){ 
                 //convert nex ten tokens to int and add data to cpu_struct
-                fprintf(stdout, "\n\n\n%s\n", token);
                 for(int i = 0 ; i < cpu_info1->parameters_len; i++){
                     //copy raw_data to prev_raw_data
                     // needded for calculate usage percent
@@ -214,7 +213,6 @@ void* thread_analyzer_func(void *arg){
                     //convert to int and save values in raw_data
                     cpu_info1->raw_data[cpu_index][i] = atoi(token);
                 }
-                fprintf(stdout, "OUT :%s\n", token);
                 //end of cores , breake
                 if(cpu_index == cpu_info1->nr_cores){
                     //end of data needed
@@ -226,8 +224,41 @@ void* thread_analyzer_func(void *arg){
         }
         for(int i = 0 ; i <= cpu_info1->nr_cores; i++){
             cpu_info1->procent_use[i] = calculate_usage(cpu_info1->prev_raw_data[i], cpu_info1->raw_data[i]);
-            fprintf(stdout, "core : %lf \n",cpu_info1->procent_use[i]);
+            //fprintf(stdout, "core : %lf \n",cpu_info1->procent_use[i]);
         }
     }
+    return NULL;
+}
+inline static int get_bar_width(int procent_usage, char* bar){
+
+        for(int i = 0; i < 50; i++){
+            if(i <= procent_usage)
+                bar[i] = '|';
+            else
+                bar[i] = ' '; 
+        }
+}
+void* thread_printer_func(void *arg){
+    CpuInfo* cpu_info = (CpuInfo*) arg;
+    char usage_bar_str[51];
+    char cpu_str[7];
+
+    usage_bar_str[50] = '\0';
+
+    while (1)
+    {   
+        for(int i = 0; i <= cpu_info->nr_cores; i++){
+            if(i == 0 ){
+                strcpy(cpu_str, "CPU  ");
+            }else{
+                sprintf(cpu_str, "Core%d", (i-1));
+            }
+            get_bar_width((int)(cpu_info->procent_use[i] * 50.0), usage_bar_str);
+            printf("%s[%s%.2f%%]\n",cpu_str, usage_bar_str, (cpu_info->procent_use[i] * 100.0));
+        }
+        sleep(1);
+        system("clear");
+    }
+    
     return NULL;
 }
