@@ -5,19 +5,50 @@
 #include "inc/tracker.h"
 #include "inc/queue.h"
 
+//enums corelate to columns names in raw_data
+enum {USER, NICE, SYSTEM, IDLE, IOWAIT, IRQ, SOFTIRQ, STEAL, GUEST, GUEST_NICE,};
 
 typedef 
         struct _CpuInfo{
             Queue* queue;
             int nr_cores;
             int parameters_len;
-            int* procent_use;
+            double* procent_use;
             char** labels;
-            int** raw_data;
+            u_int64_t** raw_data;
+            u_int64_t** prev_raw_data;
         }CpuInfo;
 
 static CpuInfo* create_cpu(int n_cpu, int parameters_len);
-static void destory_cpu(CpuInfo* cpu);
+//static void destory_cpu(CpuInfo* cpu);
+
+/*function calculates percent usage of cores
+    prev_cpu_data => previous readed data
+    cpu_data => currently readed data
+*/ 
+static double calculate_usage(u_int64_t* prev_cpu_data, u_int64_t* cpu_data){
+    u_int64_t prev_idle, prev_non_idle,\
+     idle, non_idle,\
+     prev_total, total; 
+
+  
+    prev_idle = prev_cpu_data[IDLE] + prev_cpu_data[IOWAIT];
+    idle = cpu_data[IDLE] + cpu_data[IOWAIT];
+    
+    prev_non_idle = prev_cpu_data[USER] + prev_cpu_data[NICE] + prev_cpu_data[SYSTEM]\
+     + prev_cpu_data[IRQ] + prev_cpu_data[SOFTIRQ] + prev_cpu_data[STEAL];
+    
+    non_idle = cpu_data[USER] + cpu_data[NICE] + cpu_data[SYSTEM]\
+     + cpu_data[IRQ] + cpu_data[SOFTIRQ] + cpu_data[STEAL];
+    
+    prev_total = prev_idle + prev_non_idle;
+    total = idle + non_idle;
+
+    total =  total - prev_total;
+    idle = idle - prev_idle;
+    
+    return (double)(total - idle) / (double)total;
+}
 
 void* init_tracker(void){
 
@@ -40,8 +71,8 @@ static void copy_labels(CpuInfo* cpu){
 }
 /*function create sturcture that describe cpu
     c_cpu => numbers of cores
-    parameters_len => numbers of parameters to read from data*/
-
+    parameters_len => numbers of parameters to read from data
+*/
 static CpuInfo* create_cpu(int n_cpu, int parameters_len){
 
     // allocate memory for struct
@@ -53,7 +84,7 @@ static CpuInfo* create_cpu(int n_cpu, int parameters_len){
     //numbers of parameters to read
     temp_cpu->parameters_len = parameters_len;
     // procent usage all cores + cpu
-    temp_cpu->procent_use = (int*) malloc(sizeof(int) * (n_cpu + 1));
+    temp_cpu->procent_use = (double*) malloc(sizeof(double) * (n_cpu + 1));
     // label + 1 for cores + cpu
     temp_cpu->labels = (char **) malloc(sizeof(char*) * (n_cpu + 1));
     // size of labels
@@ -62,9 +93,13 @@ static CpuInfo* create_cpu(int n_cpu, int parameters_len){
         temp_cpu->labels[i] = (char *) malloc(sizeof(char) * 6); 
     }
     // (cores+1) * number of parameters
-    temp_cpu->raw_data = (int **) malloc(sizeof(int *) * (n_cpu + 1));
+    temp_cpu->raw_data = (u_int64_t**) malloc(sizeof(u_int64_t *) * (n_cpu + 1));
+    // the same for prev_raw_data
+    temp_cpu->prev_raw_data = (u_int64_t**) malloc(sizeof(u_int64_t *) * (n_cpu + 1));
+
     for(int i = 0; i < (n_cpu+1); i++){
-        temp_cpu->raw_data[i] = (int*) malloc(sizeof(int*) * parameters_len);
+        temp_cpu->raw_data[i] = (u_int64_t*) malloc(sizeof(u_int64_t*) * parameters_len);
+        temp_cpu->prev_raw_data[i] = (u_int64_t*) malloc(sizeof(u_int64_t*) * parameters_len);
     }  
     // add labels
     copy_labels(temp_cpu);
@@ -79,10 +114,12 @@ static void destory_cpu(CpuInfo* cpu){
     //data_raw rows are equal to numbers of labels
     for(int i = 0; i <= cpu->nr_cores; i++){
         free(cpu->raw_data[i]);
+        free(cpu->prev_raw_data[i]);
         free(cpu->labels[i]);
     }
     free(cpu->labels);
     free(cpu->raw_data);
+    free(cpu->prev_raw_data);
     free(cpu);
 
 }
@@ -170,12 +207,15 @@ void* thread_analyzer_func(void *arg){
                 //convert nex ten tokens to int and add data to cpu_struct
                 fprintf(stdout, "\n\n\n%s\n", token);
                 for(int i = 0 ; i < cpu_info1->parameters_len; i++){
-
+                    //copy raw_data to prev_raw_data
+                    // needded for calculate usage percent
+                    cpu_info1->prev_raw_data[cpu_index][i] = cpu_info1->raw_data[cpu_index][i];
                     token = strtok(NULL, " \n");
                     //convert to int and save values in raw_data
                     cpu_info1->raw_data[cpu_index][i] = atoi(token);
                 }
                 fprintf(stdout, "OUT :%s\n", token);
+                //end of cores , breake
                 if(cpu_index == cpu_info1->nr_cores){
                     //end of data needed
                     break;
@@ -184,7 +224,10 @@ void* thread_analyzer_func(void *arg){
             }
             token = strtok(NULL, " \n");
         }
-        
+        for(int i = 0 ; i <= cpu_info1->nr_cores; i++){
+            cpu_info1->procent_use[i] = calculate_usage(cpu_info1->prev_raw_data[i], cpu_info1->raw_data[i]);
+            fprintf(stdout, "core : %lf \n",cpu_info1->procent_use[i]);
+        }
     }
     return NULL;
 }
