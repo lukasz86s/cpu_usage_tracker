@@ -2,5 +2,6 @@
     "files.associations": {
         "stdio.h": "c",
         "queue.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": true
 }

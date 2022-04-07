@@ -13,11 +13,13 @@ long get_ncpu(void);
 
 
 int main(int arg, char *args[]){
+    fprintf(stdout,"TEST 1\n");
+    void *cpu_inst;
+    cpu_inst = init_tracker();
     pthread_t thread_read, thread_analyzer;
-    printf("TEST\n");
-
-    pthread_create(&thread_read, NULL, thread_reader_func, NULL);
-    pthread_create(&thread_analyzer, NULL, thread_analyzer_func, NULL);
+    fprintf(stdout,"TEST 2\n");
+    pthread_create(&thread_read, NULL, thread_reader_func, cpu_inst);
+    pthread_create(&thread_analyzer, NULL, thread_analyzer_func, cpu_inst);
     
     void** result;
     pthread_join(thread_read, result);
