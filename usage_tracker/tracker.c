@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,8 +16,8 @@ typedef
             int parameters_len;
             double* procent_use;
             char** labels;
-            u_int64_t** raw_data;
-            u_int64_t** prev_raw_data;
+            uint64_t** raw_data;
+            uint64_t** prev_raw_data;
         }CpuInfo;
 
 static CpuInfo* create_cpu(int n_cpu, int parameters_len);
@@ -26,8 +27,8 @@ static CpuInfo* create_cpu(int n_cpu, int parameters_len);
     prev_cpu_data => previous readed data
     cpu_data => currently readed data
 */ 
-static double calculate_usage(u_int64_t* prev_cpu_data, u_int64_t* cpu_data){
-    u_int64_t prev_idle, prev_non_idle,\
+static double calculate_usage(uint64_t* prev_cpu_data, uint64_t* cpu_data){
+    uint64_t prev_idle, prev_non_idle,\
      idle, non_idle,\
      prev_total, total; 
 
@@ -93,13 +94,13 @@ static CpuInfo* create_cpu(int n_cpu, int parameters_len){
         temp_cpu->labels[i] = (char *) malloc(sizeof(char) * 6); 
     }
     // (cores+1) * number of parameters
-    temp_cpu->raw_data = (u_int64_t**) malloc(sizeof(u_int64_t *) * (n_cpu + 1));
+    temp_cpu->raw_data = (uint64_t**) malloc(sizeof(uint64_t *) * (n_cpu + 1));
     // the same for prev_raw_data
-    temp_cpu->prev_raw_data = (u_int64_t**) malloc(sizeof(u_int64_t *) * (n_cpu + 1));
+    temp_cpu->prev_raw_data = (uint64_t**) malloc(sizeof(uint64_t *) * (n_cpu + 1));
 
     for(int i = 0; i < (n_cpu+1); i++){
-        temp_cpu->raw_data[i] = (u_int64_t*) malloc(sizeof(u_int64_t*) * parameters_len);
-        temp_cpu->prev_raw_data[i] = (u_int64_t*) malloc(sizeof(u_int64_t*) * parameters_len);
+        temp_cpu->raw_data[i] = (uint64_t*) malloc(sizeof(uint64_t*) * parameters_len);
+        temp_cpu->prev_raw_data[i] = (uint64_t*) malloc(sizeof(uint64_t*) * parameters_len);
     }  
     // add labels
     copy_labels(temp_cpu);
@@ -155,7 +156,7 @@ void* thread_reader_func(void *arg){
     char cpu_raw_data[FILE_BUFFER_SIZE];
     int file_copy_effect;
     while(1){
-        sleep(1.5);
+        sleep(1);
         //copy data from file
         file_copy_effect = copy_file(cpu_raw_data);
         
@@ -229,7 +230,7 @@ void* thread_analyzer_func(void *arg){
     }
     return NULL;
 }
-inline static int get_bar_width(int procent_usage, char* bar){
+void get_bar_width(int procent_usage, char* bar){
 
         for(int i = 0; i < 50; i++){
             if(i <= procent_usage)
