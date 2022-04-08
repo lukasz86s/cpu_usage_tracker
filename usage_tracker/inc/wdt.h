@@ -13,5 +13,6 @@ typedef
 
 Wdt* create_wdt(unsigned int n_timers, void (* wdc_call)(void));
 void destroy_wdt(Wdt* wdt);
-void check_wdt(void);
+void check_wdt(Wdt* wdt);
+void set_wdt_all_timers(Wdt* wdt, unsigned long int val);
 #endif

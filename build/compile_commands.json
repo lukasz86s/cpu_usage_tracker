@@ -15,5 +15,11 @@
   "directory": "/home/fet/workspace_/cpu_usage_tracker/build",
   "command": "/usr/bin/clang   -pthread   -o CMakeFiles/cpu_usage_tracker.dir/usage_tracker/tracker.c.o   -c /home/fet/workspace_/cpu_usage_tracker/usage_tracker/tracker.c",
   "file": "/home/fet/workspace_/cpu_usage_tracker/usage_tracker/tracker.c"
+},
+
+{
+  "directory": "/home/fet/workspace_/cpu_usage_tracker/build",
+  "command": "/usr/bin/clang   -pthread   -o CMakeFiles/cpu_usage_tracker.dir/usage_tracker/wdt.c.o   -c /home/fet/workspace_/cpu_usage_tracker/usage_tracker/wdt.c",
+  "file": "/home/fet/workspace_/cpu_usage_tracker/usage_tracker/wdt.c"
 }
 ]

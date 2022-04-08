@@ -17,8 +17,20 @@ void destroy_wdt(Wdt* wdt){
     free(wdt->timers);
     free(wdt);
 }
+void set_wdt_all_timers(Wdt* wdt, unsigned long int val)
+{
+        for(int i = 0; i < wdt->n_timers; i++){
+        // if some timer reach 0 , call wdt_call
+        wdt->timers[i] = val;
+    }
+}
 
 void check_wdt(Wdt* wdt){
-    wdt->wdt_call();
+    for(int i = 0; i < wdt->n_timers; i++){
+        // if some timer reach 0 , call wdt_call
+        if(!(wdt->timers[i]--)) 
+            wdt->wdt_call();
+    }
+    
 }
 

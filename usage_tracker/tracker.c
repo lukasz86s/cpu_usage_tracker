@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "inc/tracker.h"
 #include "inc/queue.h"
+#include "inc/wdt.h"
 
 //enums corelate to columns names in raw_data
 enum {USER, NICE, SYSTEM, IDLE, IOWAIT, IRQ, SOFTIRQ, STEAL, GUEST, GUEST_NICE,};
@@ -18,6 +19,7 @@ typedef
             char** labels;
             uint64_t** raw_data;
             uint64_t** prev_raw_data;
+            Wdt* wdt;
         }CpuInfo;
 
 static CpuInfo* create_cpu(int n_cpu, int parameters_len);
@@ -51,7 +53,7 @@ static double calculate_usage(uint64_t* prev_cpu_data, uint64_t* cpu_data){
     return (double)(total - idle) / (double)total;
 }
 
-void* init_tracker(void){
+void* init_tracker(int n_cores){
 
     CpuInfo* temp_cpu;
     temp_cpu = (CpuInfo*) malloc(sizeof(CpuInfo));
@@ -69,6 +71,12 @@ static void copy_labels(CpuInfo* cpu){
         }
         
 
+}
+//TODO: implemet functio triggered on wathdog
+// maby move to wdt file 
+// try trigger SIGREEG in function?
+void wdt_call(void){
+    printf(" call wdt func \n");
 }
 /*function create sturcture that describe cpu
     c_cpu => numbers of cores
@@ -97,11 +105,12 @@ static CpuInfo* create_cpu(int n_cpu, int parameters_len){
     temp_cpu->raw_data = (uint64_t**) malloc(sizeof(uint64_t *) * (n_cpu + 1));
     // the same for prev_raw_data
     temp_cpu->prev_raw_data = (uint64_t**) malloc(sizeof(uint64_t *) * (n_cpu + 1));
-
+    //TODO: add memset to inint prev_raw_data values to 0
     for(int i = 0; i < (n_cpu+1); i++){
         temp_cpu->raw_data[i] = (uint64_t*) malloc(sizeof(uint64_t*) * parameters_len);
         temp_cpu->prev_raw_data[i] = (uint64_t*) malloc(sizeof(uint64_t*) * parameters_len);
-    }  
+    }
+    temp_cpu->wdt = create_wdt(3, wdt_call); 
     // add labels
     copy_labels(temp_cpu);
     return temp_cpu;
@@ -110,6 +119,8 @@ static void destory_cpu(CpuInfo* cpu){
 
     //free queue memory
     destroy_queue(cpu->queue);
+    //free watchdog memory 
+    destroy_wdt(cpu->wdt);
     //
     free(cpu->procent_use);
     //data_raw rows are equal to numbers of labels
@@ -261,5 +272,15 @@ void* thread_printer_func(void *arg){
         system("clear");
     }
     
+    return NULL;
+}
+
+void* thread_watchdog_func(void *arg){
+    CpuInfo* cpu_info = (CpuInfo*) arg;
+    while(1){
+    // decrease and check timers.calls selected function if wdt trigger 
+    check_wdt(cpu_info->wdt);
+    sleep(1);
+    }
     return NULL;
 }
