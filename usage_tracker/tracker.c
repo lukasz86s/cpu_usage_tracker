@@ -135,6 +135,8 @@ static CpuInfo* create_cpu(unsigned long n_cpu, int parameters_len){
 
     // allocate memory for struct
     CpuInfo* temp_cpu = (CpuInfo* )malloc(sizeof(CpuInfo));
+    // initialize with zeros
+    memset(temp_cpu, 0, sizeof(CpuInfo) );
     //create queue
     temp_cpu->queue = create_queue();
     // set working state to 1
@@ -167,7 +169,6 @@ static CpuInfo* create_cpu(unsigned long n_cpu, int parameters_len){
     return temp_cpu;
 }
 static void destory_cpu(CpuInfo* cpu){
-
     //free queue memory
     destroy_queue(cpu->queue);
     //free watchdog memory 
@@ -221,7 +222,11 @@ void* thread_reader_func(void *arg){
     //TODO: replace FILE_BUFER_SIZE by couting data size func
     CpuInfo* cpu_info = (CpuInfo*) arg;
     char cpu_raw_data[FILE_BUFFER_SIZE];
-    int file_copy_effect;
+    int file_copy_effect = 0;
+
+    //initialize memory
+    memset(cpu_raw_data, 0, FILE_BUFFER_SIZE );
+
     while(cpu_info->work){
         sleep(1);
         //reset watchdog timer
@@ -253,7 +258,9 @@ void* thread_analyzer_func(void *arg){
     //CpuInfo *cpu_info = (CpuInfo* ) arg;
     char cpu_raw_data[FILE_BUFFER_SIZE];
     char* token = NULL;
-    unsigned long cpu_index;
+    unsigned long cpu_index = 0;
+    //initialize memory
+    memset(cpu_raw_data, 0, FILE_BUFFER_SIZE );
 
     while (cpu_info->work){
         sleep(1);
@@ -311,9 +318,12 @@ void* thread_printer_func(void *arg){
     CpuInfo* cpu_info = (CpuInfo*) arg;
     char usage_bar_str[51];
     char cpu_str[7];
-
+    // initialize arrays
+    memset(usage_bar_str, 0, 51);
+    memset(cpu_str, 0, 7);
     usage_bar_str[50] = '\0';
-
+    //clear screen
+    system("clear");
     while (cpu_info->work)
     {   
         //reset watchdog timer

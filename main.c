@@ -20,9 +20,7 @@ static void wdt_call(void);
 
 int main(void){
 
-    
     threads_array = create_threads();
-
     // SIGTERM test
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));

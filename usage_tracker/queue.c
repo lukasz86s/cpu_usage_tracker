@@ -41,7 +41,7 @@ static int is_full(Queue* queue){
 void append_queu(Queue* queue, char* item, int len){
     
     if(is_full(queue)){
-        perror("ERROR: queue is full");
+        
         return;
     }
     char* temp_data = (char* ) calloc((unsigned long)len, sizeof(char));
@@ -57,7 +57,7 @@ void append_queu(Queue* queue, char* item, int len){
 int decrease_queue(Queue* queue, char* buff, int len){
 
     if(is_empty(queue)){
-        perror("ERROR: queue is empty\n");
+
         return 1;
     }
     //copydata
