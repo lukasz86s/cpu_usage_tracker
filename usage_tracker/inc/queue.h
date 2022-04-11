@@ -6,7 +6,7 @@
 typedef
 struct _Queue{
     int head, tail, size;
-    char * array[QUEUE_LEN];
+    char *array[QUEUE_LEN];
 }Queue;
 
 /*function create new queue*/
@@ -20,6 +20,5 @@ void append_queu(Queue* queue, char* item, int len);
 
 /*function remove an item from queue*/
 int decrease_queue(Queue* queue, char* buff, int len);
-
 
 #endif

@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*function check if the queue is empty  */
+static int is_empty(Queue* queue);
+/*function check if the queue is full  */
+static int is_full(Queue* queue);
 
 Queue* create_queue(void){
     Queue* queue = (Queue*) malloc(sizeof(Queue));
@@ -13,21 +17,23 @@ Queue* create_queue(void){
 }
 
 void destroy_queue(Queue* queue){
-    // free array memory
     for(int i = 0; i < QUEUE_LEN; i++){
-        if (queue->array[i] != NULL){
+        // if program was intrupted, check if something steyed in array
+        if(queue->array[i] != NULL){
             free(queue->array[i]);
+
         }
+    }
     // destroy queue struct
     free(queue);    
-    }
+    
 }
 /*function check if the queue is empty  */
-int is_empty(Queue* queue){
+static int is_empty(Queue* queue){
     return (queue->size == 0);
 }
 /*function check if the queue is full  */
-int is_full(Queue* queue){
+static int is_full(Queue* queue){
     return (queue->size == QUEUE_LEN);
 }
 
@@ -38,9 +44,9 @@ void append_queu(Queue* queue, char* item, int len){
         perror("ERROR: queue is full");
         return;
     }
-    char* temp_data = (char* ) malloc(sizeof(char) * len);
+    char* temp_data = (char* ) calloc((unsigned long)len, sizeof(char));
     //copy data 
-    strncpy(temp_data, item, len);
+    strncpy(temp_data, item,(unsigned long) len);
     // checks if is out of array
     queue->tail = (queue->tail +1) % QUEUE_LEN;
     queue->array[queue->tail] = temp_data;
@@ -55,9 +61,11 @@ int decrease_queue(Queue* queue, char* buff, int len){
         return 1;
     }
     //copydata
-    strncpy(buff, queue->array[queue->head], len);
+    strncpy(buff, queue->array[queue->head], (unsigned long)len);
     // free pointer memory
     free(queue->array[queue->head]);
+    //set pointer to null
+    queue->array[queue->head] = NULL;
     //incres tail
     queue->head = (queue->head + 1) % QUEUE_LEN;
     queue->size -= 1;

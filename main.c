@@ -1,51 +1,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <signal.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "usage_tracker/inc/tracker.h"
 
 
-pthread_t thread_read, thread_analyzer, thread_printer, thread_watchdog;
-void** result;
+pthread_t* threads_array;
+Cpu cpu_inst;
 
 /*function get cpu info
   return -> numbers of cores */
-long get_ncpu(void);
+static long get_ncpu(void);
 //function handles SIGTERM
-void sig_term(int sig){
-    //
+static void sig_term(int sig);
+// 
+static void wdt_call(void);
 
-}
+int main(void){
 
-int main(int arg, char *args[]){
+    
+    threads_array = create_threads();
+
     // SIGTERM test
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = sig_term;
     sigaction(SIGTERM, &action, NULL);
- 
-    fprintf(stdout,"TEST 1\n");
-    void *cpu_inst;
-    cpu_inst = init_tracker(get_ncpu());
+    //-------------------------------//
+
+    cpu_inst = init_tracker(get_ncpu(), wdt_call);
     
+    start_threads(threads_array, cpu_inst);
+    join_threads(threads_array);
     
-    
-    pthread_create(&thread_read, NULL, thread_reader_func, cpu_inst);
-    pthread_create(&thread_analyzer, NULL, thread_analyzer_func, cpu_inst);
-    pthread_create(&thread_analyzer, NULL, thread_printer_func, cpu_inst);
-    pthread_create(&thread_watchdog, NULL, thread_watchdog_func, cpu_inst);
-    
-    
-    pthread_join(thread_read, result);
-    pthread_join(thread_analyzer, result);
-    pthread_join(thread_printer, result);
-    pthread_join(thread_watchdog, result);
+    clean_cpu(cpu_inst);
+    frre_threads_mem(threads_array);
     return 0;
 }
 
-long  get_ncpu(void){
+//function handles SIGTERM
+static void sig_term(int sig){
+    //
+    kill_thread(threads_array);
+    clean_cpu(cpu_inst);
+    frre_threads_mem(threads_array);
+    printf("sig param %d\n", sig);
+    exit(1);
+  
+}
+
+
+static long  get_ncpu(void){
     long  n_processor =  sysconf(_SC_NPROCESSORS_ONLN);
     if(n_processor == -1){
         return -1;
@@ -53,3 +60,8 @@ long  get_ncpu(void){
     return n_processor;
 }
 
+static void wdt_call(void){
+    kill_thread(threads_array);
+    exit(1);
+    
+}
