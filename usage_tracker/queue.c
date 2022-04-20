@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "inc/logger.h"
 
 /*function check if the queue is empty  */
 static int is_empty(Queue* queue);
@@ -41,7 +42,7 @@ static int is_full(Queue* queue){
 void append_queu(Queue* queue, char* item, int len){
     
     if(is_full(queue)){
-        
+        write_log("Queue is full");
         return;
     }
     char* temp_data = (char* ) calloc((unsigned long)len, sizeof(char));
@@ -57,7 +58,7 @@ void append_queu(Queue* queue, char* item, int len){
 int decrease_queue(Queue* queue, char* buff, int len){
 
     if(is_empty(queue)){
-
+        write_log("Queue is empty");
         return 1;
     }
     //copydata

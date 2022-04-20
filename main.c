@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "usage_tracker/inc/tracker.h"
+#include "usage_tracker/inc/logger.h"
 
 
 pthread_t* threads_array;
@@ -19,7 +20,7 @@ static void sig_term(int sig);
 static void wdt_call(void);
 
 int main(void){
-
+    write_log("start program");
     threads_array = create_threads();
     // SIGTERM test
     struct sigaction action;
@@ -35,6 +36,7 @@ int main(void){
     
     clean_cpu(cpu_inst);
     frre_threads_mem(threads_array);
+    write_log("end program");
     return 0;
 }
 
