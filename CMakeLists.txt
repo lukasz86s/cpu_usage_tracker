@@ -17,6 +17,7 @@ set(WDT_DIRS
     usage_tracker/inc/wdt.h)
 
 set(CMAKE_C_FLAGS_DEBUG "-pthread")
+set(CMAKE_C_FLAGS_RELEASE "-pthread")
 
 add_executable(cpu_usage_tracker 
     main.c

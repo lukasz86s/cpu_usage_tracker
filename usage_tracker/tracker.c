@@ -270,7 +270,6 @@ void* thread_analyzer_func(void *arg){
         
         //decrease_queue(queue1, cpu_raw_data, FILE_BUFFER_SIZE) ;
         if(decrease_queue(cpu_info->queue, cpu_raw_data, FILE_BUFFER_SIZE) != 0){
-            perror( "nothing to read\n");
            continue;
         }
         //reset cpu_index;
@@ -317,10 +316,10 @@ static void get_bar_width(int procent_usage, char* bar){
 void* thread_printer_func(void *arg){
     CpuInfo* cpu_info = (CpuInfo*) arg;
     char usage_bar_str[51];
-    char cpu_str[7];
+    char cpu_str[12];
     // initialize arrays
     memset(usage_bar_str, 0, 51);
-    memset(cpu_str, 0, 7);
+    memset(cpu_str, 0, 12);
     usage_bar_str[50] = '\0';
     //clear screen
     system("clear");
@@ -329,11 +328,11 @@ void* thread_printer_func(void *arg){
         //reset watchdog timer
         reset_wdt_timer(cpu_info->wdt, 2ul);
 
-        for(unsigned long  i = 0; i <= cpu_info->nr_cores; i++){
+        for(unsigned short i = 0; i <= cpu_info->nr_cores; i++){
             if(i == 0 ){
                 strcpy(cpu_str, "CPU  ");
             }else{
-                sprintf(cpu_str, "Core%lu", (i-1));
+                sprintf(cpu_str, "Core%d", (i-1));
             }
             get_bar_width((int)(cpu_info->procent_use[i] * 50.0), usage_bar_str);
             printf("%s[%s%.2f%%]\n",cpu_str, usage_bar_str, (cpu_info->procent_use[i] * 100.0));
